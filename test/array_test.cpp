@@ -13,6 +13,6 @@ using namespace matrix;
 
 int main(int argc, const char * argv[]) {
     UNITY_BEGIN();
-    test__Array();
+    test__Matrix();
     return UNITY_END();
 }

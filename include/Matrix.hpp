@@ -12,6 +12,16 @@
 #include <iterator>
 #include <utility>
 
+#ifdef TESTING
+#include "unity.h"
+#define ASSERT(...) TEST_ASSERT(__VA_ARGS__)
+#else
+#include <cassert>
+#define ASSERT(...) assert(__VA_ARGS__)
+#endif
+
+namespace matrix {
+
 typedef std::pair<int,int> Shape;
 typedef Shape Position;
 
@@ -287,13 +297,16 @@ public:
             return (*rit);
         }
 
-    }
+    };
     
     class const_iterator:public iterator {
+        c_iterator_const cit, end;
+        r_iterator_const rit;
+    public:
         const T& operator*(void) const {
             return (*rit);
         }
-    }
+    };
     
 // Iterator Creator
     iterator begin(void) {
@@ -342,69 +355,10 @@ Matrix<T> Matrix_Ones(int cols=1, int rows=1) {
     return Matrix_Ones<T>(Shape(cols,rows));
 }
 
+};
+
 void test__Matrix(void);
 
-#ifdef TESTING
-#define _NUM_T_RUN_TEST(func)           \
-do {                                \
-RUN_TEST( func <int> );             \
-RUN_TEST( func <short> );           \
-RUN_TEST( func <long> );            \
-RUN_TEST( func <unsigned int> );    \
-RUN_TEST( func <unsigned short> );  \
-RUN_TEST( func <unsigned long> );   \
-RUN_TEST( func <char> );            \
-RUN_TEST( func <float> );           \
-RUN_TEST( func <double> );          \
-RUN_TEST( func <long double> );     \
-} while(false)
-
-typedef void (*void_func) (void);
-
-typedef unsigned int unint;
-typedef unsigned short unshort;
-typedef unsigned long unlong;
-typedef long long longlong;
-typedef long double longdouble;
-
-#define ___RUN_TEST(func,type1,type2)       \
-do {                                    \
-void_func func ## _ ## type1 ## _ ## type2      \
-= func < type1, type2 >;                       \
-RUN_TEST( (func ## _ ## type1 ## _ ## type2) ); \
-} while(false)
-
-#define RUN_TEST_S(func, type1)                \
-do {                                       \
-___RUN_TEST( func,type1,int );             \
-___RUN_TEST( func,type1,short );           \
-___RUN_TEST( func,type1,long );            \
-___RUN_TEST( func,type1,longlong );        \
-___RUN_TEST( func,type1,unint );           \
-___RUN_TEST( func,type1,unshort );         \
-___RUN_TEST( func,type1,unlong );          \
-___RUN_TEST( func,type1,char );            \
-___RUN_TEST( func,type1,float );           \
-___RUN_TEST( func,type1,double );          \
-___RUN_TEST( func,type1,longdouble );      \
-} while(false)
-
-#define _NUM_T_K_RUN_TEST(func)          \
-do {                                 \
-RUN_TEST_S( func, int );             \
-RUN_TEST_S( func, short );           \
-RUN_TEST_S( func, long );            \
-RUN_TEST_S( func, longlong );        \
-RUN_TEST_S( func, unint );           \
-RUN_TEST_S( func, unshort );         \
-RUN_TEST_S( func, unlong );          \
-RUN_TEST_S( func, char );            \
-RUN_TEST_S( func, float );           \
-RUN_TEST_S( func, double );          \
-RUN_TEST_S( func, longdouble );      \
-} while(false)
-
-#endif//TESTING
 
 
 #endif /* Matrix_h */
