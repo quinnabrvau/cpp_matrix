@@ -26,3 +26,6 @@ target_compile_definitions(MATRIX_TEST_LIB
 add_library(MATRIX_LIB
     ${MATRIX_SOURCES}
 )
+target_compile_options(MATRIX_LIB
+    PRIVATE -O3
+)
