@@ -1,28 +1,28 @@
-project( GENETIC_LIB )
+project( MATRIX_LIB )
 cmake_minimum_required (VERSION 3.4)
 
 file(GLOB_RECURSE headers "../include/*.hpp")
 
-set( GENETIC_SOURCES
-    ./Genetic.cpp
-    ../include/Genetic.hpp
+set( MATRIX_SOURCES
+    ./Matrix.cpp
+    ../include/Matrix.hpp
 )
 
 include_directories(
     ../include
 )
 
-add_library(GENETIC_TEST_LIB
+add_library(MATRIX_TEST_LIB
     ../unity/src/unity.c
-    ${GENETIC_SOURCES}
+    ${MATRIX_SOURCES}
 )
-target_include_directories(GENETIC_TEST_LIB
+target_include_directories(MATRIX_TEST_LIB
     PRIVATE ../unity/src
 )
-target_compile_definitions(GENETIC_TEST_LIB
+target_compile_definitions(MATRIX_TEST_LIB
     PRIVATE TESTING
 )
 
-add_library(GENETIC_LIB
-    ${GENETIC_SOURCES}
+add_library(MATRIX_LIB
+    ${MATRIX_SOURCES}
 )
