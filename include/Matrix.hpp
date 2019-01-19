@@ -11,6 +11,7 @@
 #include <vector>
 #include <iterator>
 #include <utility>
+#include <iterator>
 
 #ifdef TESTING
 #include "unity.h"
@@ -27,7 +28,8 @@ typedef Shape Position;
 
 template<class T>
 class Matrix {
-    std::vector<std::vector<T>> matrix;
+    typedef std::vector<T> row_type;
+    std::vector<row_type> matrix;
     void init_matrix(int cols = 1, int rows = 1) {
         matrix.clear();
         for (int c = 0; c<cols; c++) {
@@ -265,67 +267,180 @@ public:
     typedef typename std::vector<T>::const_iterator r_iterator_const;              //row iterator const
 
     class iterator {
-        c_iterator cit, end;
+        c_iterator cit, end_;
         r_iterator rit;
+        int index;
     public:
-        iterator(c_iterator _c_it,r_iterator _r_it,c_iterator _end) :
-            cit(_c_it), rit(_r_it), end(_end) {}
-        bool operator==(iterator const * const it) const {
-            if (this->cit != it->cit) return false;
-            if (this->rit != it->rit) return false;
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef size_t difference_type;
+        
+        iterator(c_iterator _c_it,r_iterator _r_it,c_iterator _end, int _index) :
+            cit(_c_it), end_(_end), rit(_r_it), index(_index) {}
+        
+        bool operator==(iterator const * const it) const{
+            if (cit == end_ && it->cit == end_)
+                return true;
+            if (this->cit != it->cit)
+                return false;
+            if (this->rit != it->rit)
+                return false;
             return true;
         }
-        void operator++(void) const {
-            if ((++rit) == (*cit).end()) {
-                cit++; 
-                if (cit != end) {
+        bool operator!=(iterator const * const it) const{
+            if (cit == end_ && it->cit == end_)
+                return false;
+            if (this->cit == it->cit && this->rit == it->rit)
+                return false;
+            return true;
+        }
+        
+        bool operator==(iterator const &it) const{
+            if (cit == end_ && it.cit == end_)
+                return true;
+            if (this->cit != it.cit)
+                return false;
+            if (this->rit != it.rit)
+                return false;
+            return true;
+        }
+        bool operator!=(iterator const &it) const{
+            if (cit == end_ && it.cit == end_)
+                return false;
+            if (this->cit == it.cit && this->rit == it.rit)
+                return false;
+            return true;
+        }
+        void next(void) {
+            if (cit == end_)
+                return;
+            rit++;
+            index++;
+            if (rit == (*cit).end()) {
+                cit++;
+                if (cit != end_) {
                     rit = (*cit).begin();
+                    index = 0;
                 }
             }
         }
-        void operator--(void) const {
-            if (rit == (*cit).begin()) {
-                cit--; 
+        void prev(void) {
+            if (rit == (*cit).begin() ||
+                cit == end_ ) {
+                cit--;
                 rit = (*cit).end();
                 rit--;
+                index = (*cit).size();
             } else {
                 rit--;
+                index--;
             }
+            if (index < 0) {
+                index--;
+            }
+        }
+        iterator operator++(void) {
+            iterator out = *this;
+            this->next();
+            return out;
+        }
+        iterator operator++(int junk) {
+            this->next(); return *this;
+        }
+        iterator operator--(void) {
+            iterator out = *this;
+            this->prev();
+            return out;
+        }
+        iterator operator--(int junk) {
+            this->prev(); return *this;
         }
 
         T& operator*(void) {
             return (*rit);
         }
-
+        T* operator->(void) {
+            return rit.operator->();
+        }
+        
+        void operator*=(int junk) {
+            cit++;
+            rit = (*cit).begin();
+            for (int i = 0; i < index; i++) {
+                rit++;
+            }
+        }
+        r_iterator begin(void) {
+            return (*cit).begin();
+        }
+        r_iterator end(void) {
+            return (*cit).end();
+        }
     };
     
     class const_iterator:public iterator {
-        c_iterator_const cit, end;
+        c_iterator_const cit, _end;
         r_iterator_const rit;
     public:
+        const_iterator(c_iterator_const _c_it, r_iterator_const _r_it, c_iterator_const _end) :
+            cit(_c_it), rit(_r_it), _end(_end) {}
+        
+        const_iterator operator++(void) {
+            const_iterator out = *this;
+            this->next();
+            return out;
+        }
+        const_iterator operator++(int junk) {
+            this->next(); return *this;
+        }
+        const_iterator operator--(void) {
+            const_iterator out = *this;
+            this->prev();
+            return out;
+        }
+        const_iterator operator--(int junk) {
+            this->prev(); return *this;
+        }
         const T& operator*(void) const {
             return (*rit);
+        }
+        const T* operator->(void) {
+            return rit.operator->();
+        }
+        r_iterator_const begin(void) {
+            return (*cit).begin();
+        }
+        r_iterator_const end(void) {
+            return (*cit).end();
         }
     };
     
 // Iterator Creator
     iterator begin(void) {
-        return iterator(matrix.begin(),matrix[0].begin(),matrix.end());
+        return iterator(matrix.begin(),matrix[0].begin(),matrix.end(),0);
     }
     iterator end(void) {
-        return iterator(matrix.end(),matrix.back().end(),matrix.end());
+        return iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
     }
     const_iterator begin(void) const {
-        return const_iterator(matrix.begin(),matrix[0].begin(),matrix.end());
+        return const_iterator(matrix.begin(),matrix[0].begin(),matrix.end(),0);
     }
     const_iterator end(void) const {
-        return const_iterator(matrix.end(),matrix.back().end(),matrix.end());
+        return const_iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
     }
     const_iterator cbegin(void) const {
-        return const_iterator(matrix.cbegin(),matrix[0].cbegin(),matrix.cend());
+        return const_iterator(matrix.cbegin(),matrix[0].cbegin(),matrix.cend(),0);
     }
     const_iterator cend(void) const {
-        return const_iterator(matrix.end(),matrix.back().end(),matrix.end());
+        return const_iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
+    }
+    
+// Iterator Init
+    Matrix (iterator be, iterator end) {
+        matrix.clear();
+        while (be != end) {
+            matrix.push_back(row_type(be.begin(),be.end()));
+            be*=1;
+        }
     }
 };
 

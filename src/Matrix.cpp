@@ -192,11 +192,54 @@ void test__add_tk(void) {
         }
     }
 }
-    
+
+template <class T>
+void test__iter_size(void) {
+    for (int i = 1; i < 20; i++) {
+        for(int j = 1; j < i; j++) {
+            Matrix<T> A = Matrix_Ones<T>(Shape(i,j));
+            do {
+                auto it = A.begin();
+                int index = 0;
+                while (it != A.end()) {
+                    it++; index++;
+                }
+                TEST_ASSERT_EQUAL(A.size(), index);
+            }while(0);
+            do {
+                auto it = A.end();
+                int index = 0;
+                while (it != A.begin()) {
+                    it--; index++;
+                }
+                TEST_ASSERT_EQUAL(A.size(), index);
+            }while(0);
+        }
+    }
+}
+
+template <class T>
+void test__iter(void) {
+    for (int i = 1; i < 20; i++) {
+        for(int j = 1; j < i; j++) {
+            Matrix<T> A = Matrix_Ones<T>(Shape(i,j));
+            Matrix<T> B(A.begin(),A.end());
+            TEST_ASSERT(A==B);
+            for (auto it = B.begin(); it != B.end(); it++) {
+                (*it) += 1;
+            }
+            Matrix<T> C = A+1;
+            TEST_ASSERT( C==B );
+            TEST_ASSERT( C==2 );
+        }
+    }
+}
 void test__Matrix(void) {
     _NUM_T_RUN_TEST(test__gen_matrix);
     _NUM_T_K_RUN_TEST(test__multiply_tk);
     _NUM_T_K_RUN_TEST(test__add_tk);
+    _NUM_T_RUN_TEST(test__iter_size);
+    _NUM_T_RUN_TEST(test__iter);
 }
     
 
