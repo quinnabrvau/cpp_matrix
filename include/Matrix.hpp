@@ -339,20 +339,20 @@ public:
             }
         }
         iterator operator++(void) {
+            this->next(); return *this;
+        }
+        iterator operator++(int junk) {
             iterator out = *this;
             this->next();
             return out;
         }
-        iterator operator++(int junk) {
-            this->next(); return *this;
-        }
         iterator operator--(void) {
+            this->prev(); return *this;
+        }
+        iterator operator--(int junk) {
             iterator out = *this;
             this->prev();
             return out;
-        }
-        iterator operator--(int junk) {
-            this->prev(); return *this;
         }
 
         T& operator*(void) {
@@ -385,20 +385,20 @@ public:
             cit(_c_it), rit(_r_it), _end(_end) {}
         
         const_iterator operator++(void) {
+            this->next(); return *this;
+        }
+        const_iterator operator++(int junk) {
             const_iterator out = *this;
             this->next();
             return out;
         }
-        const_iterator operator++(int junk) {
-            this->next(); return *this;
-        }
         const_iterator operator--(void) {
+            this->prev(); return *this;
+        }
+        const_iterator operator--(int junk) {
             const_iterator out = *this;
             this->prev();
             return out;
-        }
-        const_iterator operator--(int junk) {
-            this->prev(); return *this;
         }
         const T& operator*(void) const {
             return (*rit);
