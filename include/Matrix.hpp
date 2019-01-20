@@ -274,6 +274,8 @@ public:
         typedef std::bidirectional_iterator_tag iterator_category;
         typedef size_t difference_type;
         
+        iterator() {}
+
         iterator(c_iterator _c_it,r_iterator _r_it,c_iterator _end, int _index) :
             cit(_c_it), end_(_end), rit(_r_it), index(_index) {}
         
@@ -378,11 +380,15 @@ public:
     };
     
     class const_iterator:public iterator {
-        c_iterator_const cit, _end;
+        c_iterator_const cit, end_;
         r_iterator_const rit;
+        int index;
     public:
-        const_iterator(c_iterator_const _c_it, r_iterator_const _r_it, c_iterator_const _end) :
-            cit(_c_it), rit(_r_it), _end(_end) {}
+        // const_iterator(c_iterator _c_it, r_iterator _r_it, c_iterator _end, int _index) :
+        //     iterator(), cit(_c_it), end_(_end), rit(_r_it), index(_index) { }
+
+        const_iterator(c_iterator_const _c_it, r_iterator_const _r_it, c_iterator_const _end, int _index) :
+            iterator(), cit(_c_it), end_(_end), rit(_r_it), index(_index) { }
         
         const_iterator operator++(void) {
             this->next(); return *this;
@@ -401,16 +407,16 @@ public:
             return out;
         }
         const T& operator*(void) const {
-            return (*rit);
+            return (*(this->rit));
         }
         const T* operator->(void) {
-            return rit.operator->();
+            return &(*(this->rit));
         }
         r_iterator_const begin(void) {
-            return (*cit).begin();
+            return (*(this->cit)).cbegin();
         }
         r_iterator_const end(void) {
-            return (*cit).end();
+            return (*(this->cit)).cend();
         }
     };
     
@@ -422,16 +428,16 @@ public:
         return iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
     }
     const_iterator begin(void) const {
-        return const_iterator(matrix.begin(),matrix[0].begin(),matrix.end(),0);
+        return const_iterator(matrix.cbegin(),matrix[0].cbegin(),matrix.cend(),0);
     }
     const_iterator end(void) const {
-        return const_iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
+        return const_iterator(matrix.cend(),matrix.back().cend(),matrix.cend(),matrix.back().size());
     }
     const_iterator cbegin(void) const {
         return const_iterator(matrix.cbegin(),matrix[0].cbegin(),matrix.cend(),0);
     }
     const_iterator cend(void) const {
-        return const_iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
+        return const_iterator(matrix.cend(),matrix.back().cend(),matrix.cend(),matrix.back().size());
     }
     
 // Iterator Init
