@@ -11,8 +11,9 @@
 #include <iostream>
 
 using namespace matrix;
-    
-#define _NUM_T_RUN_TEST(func)           \
+
+
+#define _MAT_RUN_TEST_NUM_TYPE(func)       \
 do {                                \
 RUN_TEST( func <int> );             \
 RUN_TEST( func <short> );           \
@@ -35,45 +36,44 @@ typedef unsigned long unlong__A;
 typedef long long longlong__A;
 typedef long double longdouble__A;
 
-#define ___RUN_TEST(func,type1,type2)       \
+#define ___MAT_RUN_TEST(func,type1,type2)       \
 do {                                    \
 void_func func ## _ ## type1 ## _ ## type2      \
 = func < type1, type2 >;                       \
 RUN_TEST( (func ## _ ## type1 ## _ ## type2) ); \
 } while(false)
 
-#define RUN_TEST_S(func, type1)            \
+#define __MAT_RUN_TEST(func, type1)            \
 do {                                       \
-___RUN_TEST( func,type1,char );            \
-___RUN_TEST( func,type1,unchar__A );       \
-___RUN_TEST( func,type1,unshort__A );      \
-___RUN_TEST( func,type1,short );           \
-___RUN_TEST( func,type1,int );             \
-___RUN_TEST( func,type1,unint__A );        \
-___RUN_TEST( func,type1,long );            \
-___RUN_TEST( func,type1,unlong__A );       \
-___RUN_TEST( func,type1,longlong__A );     \
-___RUN_TEST( func,type1,float );           \
-___RUN_TEST( func,type1,double );          \
-___RUN_TEST( func,type1,longdouble__A );   \
+___MAT_RUN_TEST( func,type1,char );            \
+___MAT_RUN_TEST( func,type1,unchar__A );       \
+___MAT_RUN_TEST( func,type1,unshort__A );      \
+___MAT_RUN_TEST( func,type1,short );           \
+___MAT_RUN_TEST( func,type1,int );             \
+___MAT_RUN_TEST( func,type1,unint__A );        \
+___MAT_RUN_TEST( func,type1,long );            \
+___MAT_RUN_TEST( func,type1,unlong__A );       \
+___MAT_RUN_TEST( func,type1,longlong__A );     \
+___MAT_RUN_TEST( func,type1,float );           \
+___MAT_RUN_TEST( func,type1,double );          \
+___MAT_RUN_TEST( func,type1,longdouble__A );   \
 } while(false)
 
-#define _NUM_T_K_RUN_TEST(func)      \
+#define _MAT_RUN_TEST(func)      \
 do {                                 \
-RUN_TEST_S( func, char );            \
-RUN_TEST_S( func, unchar__A );       \
-RUN_TEST_S( func, short );           \
-RUN_TEST_S( func, unshort__A );      \
-RUN_TEST_S( func, int );             \
-RUN_TEST_S( func, unint__A );        \
-RUN_TEST_S( func, long );            \
-RUN_TEST_S( func, unlong__A );       \
-RUN_TEST_S( func, longlong__A );     \
-RUN_TEST_S( func, float );           \
-RUN_TEST_S( func, double );          \
-RUN_TEST_S( func, longdouble__A );   \
+__MAT_RUN_TEST( func, char );            \
+__MAT_RUN_TEST( func, unchar__A );       \
+__MAT_RUN_TEST( func, short );           \
+__MAT_RUN_TEST( func, unshort__A );      \
+__MAT_RUN_TEST( func, int );             \
+__MAT_RUN_TEST( func, unint__A );        \
+__MAT_RUN_TEST( func, long );            \
+__MAT_RUN_TEST( func, unlong__A );       \
+__MAT_RUN_TEST( func, longlong__A );     \
+__MAT_RUN_TEST( func, float );           \
+__MAT_RUN_TEST( func, double );          \
+__MAT_RUN_TEST( func, longdouble__A );   \
 } while(false)
-
 
 template <class T>
 void test__gen_matrix(void) {
@@ -235,11 +235,11 @@ void test__iter(void) {
     }
 }
 void test__Matrix(void) {
-    _NUM_T_RUN_TEST(test__gen_matrix);
-    _NUM_T_K_RUN_TEST(test__multiply_tk);
-    _NUM_T_K_RUN_TEST(test__add_tk);
-    _NUM_T_RUN_TEST(test__iter_size);
-    _NUM_T_RUN_TEST(test__iter);
+//    _MAT_RUN_TEST_NUM_TYPE(test__gen_matrix);
+//    _MAT_RUN_TEST(test__multiply_tk);
+//    _MAT_RUN_TEST(test__add_tk);
+    _MAT_RUN_TEST_NUM_TYPE(test__iter_size);
+    _MAT_RUN_TEST_NUM_TYPE(test__iter);
 }
     
 

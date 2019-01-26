@@ -11,7 +11,8 @@
 #include <vector>
 #include <iterator>
 #include <utility>
-#include <iterator>
+
+#include "Container_Multi_Level.hpp"
 
 #ifdef TESTING
 #include "unity.h"
@@ -25,11 +26,13 @@ namespace matrix {
 
 typedef std::pair<int,int> Shape;
 typedef Shape Position;
-
+    
 template<class T>
 class Matrix {
     typedef std::vector<T> row_type;
-    std::vector<row_type> matrix;
+    typedef Container_Multi_Level<std::vector<row_type>,row_type,T> tMatrix;
+    
+    tMatrix matrix;
     void init_matrix(int cols = 1, int rows = 1) {
         matrix.clear();
         for (int c = 0; c<cols; c++) {
@@ -37,7 +40,7 @@ class Matrix {
         }
     };
 public:
-    Matrix (std::vector<std::vector<T>>* p_matrix) : matrix(p_matrix-begin(),p_matrix->end) {}
+    Matrix (std::vector<std::vector<T>>* p_matrix) : matrix(p_matrix->begin(),p_matrix->end) {}
     Matrix(Shape s) {
         init_matrix(s.first, s.second);
     }
@@ -118,10 +121,8 @@ public:
     }
     template<class K>
     void operator*=(K f) {
-        for (auto rit = matrix.begin(); rit != matrix.end(); rit++) {
-            for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
-                *cit *= f;
-            }
+        for (auto it = matrix.begin(); it != matrix.end(); it++) {
+            *it *= f;
         }
     }
     template<class K>
@@ -154,19 +155,15 @@ public:
     template<class K>
     Matrix operator+(K f) {
         Matrix A = *this;
-        for (auto rit = A.matrix.begin(); rit != A.matrix.end(); rit++) {
-            for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
-                *cit += f;
-            }
+        for (auto it = A.matrix.begin(); it != A.matrix.end(); it++) {
+            *it += f;
         }
-        return A;
+        return *this;
     }
     template<class K>
     void operator+=(K f) {
-        for (auto rit = matrix.begin(); rit != matrix.end(); rit++) {
-            for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
-                *cit += f;
-            }
+        for (auto it = matrix.begin(); it != matrix.end(); it++) {
+            *it += f;
         }
     }
     
@@ -203,10 +200,8 @@ public:
     }
     template<class K>
     bool operator==(K k) {
-        for (auto rit = matrix.begin(); rit != matrix.end(); rit++) {
-            for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
-                if (*cit != k) return false;
-            }
+        for (auto it = matrix.begin(); it != matrix.end(); it++) {
+            if (*it != k) return false;
         }
         return true;
     }
@@ -260,186 +255,43 @@ public:
         }
         return true;
     }
-
-    typedef typename std::vector<std::vector<T>>::iterator c_iterator; //column iterator
-    typedef typename std::vector<T>::iterator r_iterator;              //row iterator
-    typedef typename std::vector<std::vector<T>>::const_iterator c_iterator_const; //column iterator const
-    typedef typename std::vector<T>::const_iterator r_iterator_const;              //row iterator const
-
-    class iterator {
-        c_iterator cit, end_;
-        r_iterator rit;
-        int index;
-    public:
-        typedef std::bidirectional_iterator_tag iterator_category;
-        typedef size_t difference_type;
-        
-        iterator(c_iterator _c_it,r_iterator _r_it,c_iterator _end, int _index) :
-            cit(_c_it), end_(_end), rit(_r_it), index(_index) {}
-        
-        bool operator==(iterator const * const it) const{
-            if (cit == end_ && it->cit == end_)
-                return true;
-            if (this->cit != it->cit)
-                return false;
-            if (this->rit != it->rit)
-                return false;
-            return true;
-        }
-        bool operator!=(iterator const * const it) const{
-            if (cit == end_ && it->cit == end_)
-                return false;
-            if (this->cit == it->cit && this->rit == it->rit)
-                return false;
-            return true;
-        }
-        
-        bool operator==(iterator const &it) const{
-            if (cit == end_ && it.cit == end_)
-                return true;
-            if (this->cit != it.cit)
-                return false;
-            if (this->rit != it.rit)
-                return false;
-            return true;
-        }
-        bool operator!=(iterator const &it) const{
-            if (cit == end_ && it.cit == end_)
-                return false;
-            if (this->cit == it.cit && this->rit == it.rit)
-                return false;
-            return true;
-        }
-        void next(void) {
-            if (cit == end_)
-                return;
-            rit++;
-            index++;
-            if (rit == (*cit).end()) {
-                cit++;
-                if (cit != end_) {
-                    rit = (*cit).begin();
-                    index = 0;
-                }
-            }
-        }
-        void prev(void) {
-            if (rit == (*cit).begin() ||
-                cit == end_ ) {
-                cit--;
-                rit = (*cit).end();
-                rit--;
-                index = (*cit).size();
-            } else {
-                rit--;
-                index--;
-            }
-            if (index < 0) {
-                index--;
-            }
-        }
-        iterator operator++(void) {
-            this->next(); return *this;
-        }
-        iterator operator++(int junk) {
-            iterator out = *this;
-            this->next();
-            return out;
-        }
-        iterator operator--(void) {
-            this->prev(); return *this;
-        }
-        iterator operator--(int junk) {
-            iterator out = *this;
-            this->prev();
-            return out;
-        }
-
-        T& operator*(void) {
-            return (*rit);
-        }
-        T* operator->(void) {
-            return rit.operator->();
-        }
-        
-        void operator*=(int junk) {
-            cit++;
-            rit = (*cit).begin();
-            for (int i = 0; i < index; i++) {
-                rit++;
-            }
-        }
-        r_iterator begin(void) {
-            return (*cit).begin();
-        }
-        r_iterator end(void) {
-            return (*cit).end();
-        }
-    };
     
-    class const_iterator:public iterator {
-        c_iterator_const cit, _end;
-        r_iterator_const rit;
-    public:
-        const_iterator(c_iterator_const _c_it, r_iterator_const _r_it, c_iterator_const _end) :
-            cit(_c_it), rit(_r_it), _end(_end) {}
-        
-        const_iterator operator++(void) {
-            this->next(); return *this;
-        }
-        const_iterator operator++(int junk) {
-            const_iterator out = *this;
-            this->next();
-            return out;
-        }
-        const_iterator operator--(void) {
-            this->prev(); return *this;
-        }
-        const_iterator operator--(int junk) {
-            const_iterator out = *this;
-            this->prev();
-            return out;
-        }
-        const T& operator*(void) const {
-            return (*rit);
-        }
-        const T* operator->(void) {
-            return rit.operator->();
-        }
-        r_iterator_const begin(void) {
-            return (*cit).begin();
-        }
-        r_iterator_const end(void) {
-            return (*cit).end();
-        }
-    };
     
-// Iterator Creator
+    typedef typename tMatrix::iterator iterator;
+    typedef typename tMatrix::const_iterator const_iterator;
+    
+    // Iterator Creator
     iterator begin(void) {
-        return iterator(matrix.begin(),matrix[0].begin(),matrix.end(),0);
+        return matrix.begin();
     }
     iterator end(void) {
-        return iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
+        return matrix.end();
     }
     const_iterator begin(void) const {
-        return const_iterator(matrix.begin(),matrix[0].begin(),matrix.end(),0);
+        return matrix.cbegin();
     }
     const_iterator end(void) const {
-        return const_iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
+        return matrix.cend();
     }
     const_iterator cbegin(void) const {
-        return const_iterator(matrix.cbegin(),matrix[0].cbegin(),matrix.cend(),0);
+        return matrix.cbegin();
     }
     const_iterator cend(void) const {
-        return const_iterator(matrix.end(),matrix.back().end(),matrix.end(),matrix.back().size());
+        return matrix.cend();
     }
     
 // Iterator Init
-    Matrix (iterator be, iterator end) {
-        matrix.clear();
-        while (be != end) {
-            matrix.push_back(row_type(be.begin(),be.end()));
-            be*=1;
+    Matrix (iterator be, iterator end):matrix(be,end) { }
+    Matrix (tMatrix* p_matrix) : matrix(p_matrix->begin(),p_matrix->end) {}
+    
+// Transition Functions
+    void leaky_relu(float alpha = 0.0) {
+        for (auto cit = matrix.begin(); cit != matrix.end(); cit++) {
+            for (auto rit = (*cit).begin(); rit < (*cit).end(); rit++) {
+                if (*rit < 0) {
+                    *rit *= alpha;
+                }
+            }
         }
     }
 };

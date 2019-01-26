@@ -6,6 +6,7 @@
 //
 
 #include "Matrix.hpp"
+#include "Container_Multi_Level.hpp"
 
 using namespace matrix;
 
@@ -14,5 +15,6 @@ using namespace matrix;
 int main(int argc, const char * argv[]) {
     UNITY_BEGIN();
     test__Matrix();
+    test__CML();
     return UNITY_END();
 }
