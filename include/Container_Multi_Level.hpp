@@ -30,9 +30,9 @@ namespace matrix {
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef size_t difference_type;
             
-            iterator(c_iterator _c_it,r_iterator _r_it,c_iterator _end, int _index) :
+            iterator(c_iterator _c_it, r_iterator _r_it, c_iterator _end, int _index) :
             cit(_c_it), end_(_end), rit(_r_it), index(_index) {}
-            
+        
             bool operator==(iterator const * const it) const{
                 if (cit == end_ && it->cit == end_)
                     return true;
@@ -110,7 +110,7 @@ namespace matrix {
                 this->prev();
                 return out;
             }
-            
+
             T& operator*(void) {
                 return (*rit);
             }
@@ -132,13 +132,80 @@ namespace matrix {
                 return (*cit).end();
             }
         };
-        
-        class const_iterator:public iterator {
-            c_iterator_const cit, _end;
+    
+        class const_iterator {
+            c_iterator_const cit, end_;
             r_iterator_const rit;
+            int index;
         public:
-            const_iterator(c_iterator_const _c_it, r_iterator_const _r_it, c_iterator_const _end) :
-            cit(_c_it), rit(_r_it), _end(_end) {}
+            typedef std::bidirectional_iterator_tag iterator_category;
+            typedef size_t difference_type;
+            
+            const_iterator(c_iterator_const _c_it, r_iterator_const _r_it, c_iterator_const _end, int _index) :
+                cit(_c_it), end_(_end), rit(_r_it), index(_index) {}
+            
+            bool operator==(const_iterator const * const it) const{
+                if (cit == end_ && it->cit == end_)
+                    return true;
+                if (this->cit != it->cit)
+                    return false;
+                if (this->rit != it->rit)
+                    return false;
+                return true;
+            }
+            bool operator!=(const_iterator const * const it) const{
+                if (cit == end_ && it->cit == end_)
+                    return false;
+                if (this->cit == it->cit && this->rit == it->rit)
+                    return false;
+                return true;
+            }
+            
+            bool operator==(const_iterator const &it) const{
+                if (cit == end_ && it.cit == end_)
+                    return true;
+                if (this->cit != it.cit)
+                    return false;
+                if (this->rit != it.rit)
+                    return false;
+                return true;
+            }
+            bool operator!=(const_iterator const &it) const{
+                if (cit == end_ && it.cit == end_)
+                    return false;
+                if (this->cit == it.cit && this->rit == it.rit)
+                    return false;
+                return true;
+            }
+            
+            void next(void) {
+                if (cit == end_)
+                    return;
+                rit++;
+                index++;
+                if (rit == (*cit).end()) {
+                    cit++;
+                    if (cit != end_) {
+                        rit = (*cit).begin();
+                        index = 0;
+                    }
+                }
+            }
+            void prev(void) {
+                if (rit == (*cit).begin() ||
+                    cit == end_ ) {
+                    cit--;
+                    rit = (*cit).end();
+                    rit--;
+                    index = (*cit).size();
+                } else {
+                    rit--;
+                    index--;
+                }
+                if (index < 0) {
+                    index--;
+                }
+            }
             
             const_iterator operator++(void) {
                 this->next(); return *this;
@@ -193,19 +260,19 @@ namespace matrix {
             c_iterator_const c_it = cont1::cend();
             r_iterator_const r_it = cont1::back().cend();
             c_iterator_const c_end = cont1::cend();
-            return const_iterator(c_it,r_it,c_end,cont1::back().size());
+            return const_iterator(c_it, r_it, c_end, cont1::back().size());
         }
         const_iterator cbegin(void) const {
             c_iterator_const c_it = cont1::cbegin();
             r_iterator_const r_it = (*c_it).cbegin();
             c_iterator_const c_end = cont1::cend();
-            return const_iterator(c_it,r_it,c_end,0);
+            return const_iterator(c_it, r_it, c_end, 0);
         }
         const_iterator cend(void) const {
             c_iterator_const c_it = cont1::cend();
             r_iterator_const r_it = cont1::back().cend();
             c_iterator_const c_end = cont1::cend();
-            return const_iterator(c_it,r_it,c_end,cont1::back().size());
+            return const_iterator(c_it, r_it, c_end, cont1::back().size());
         }
         
         Container_Multi_Level (iterator be, iterator end): cont1() {
@@ -235,12 +302,19 @@ namespace matrix {
         Container_Multi_Level(int size1, int size2): cont1(size1) {
             c_iterator it = cont1::begin();
             while(it != cont1::end()) {
-                (*it) = cont2(size2);
+                (*it++) = cont2(size2);
             }
         };
     };
 }
 
 void test__CML(void);
+
+#define CML1(cont, type)            \
+    Container_Multi_Level<cont<cont<type>>,cont<type>,type>
+
+#define CML2(cont1, cont2, type)    \
+    Container_Multi_Level<cont1<cont2<type>>,cont2<type>,type>
+
 
 #endif /* Container_Multi_Level_h */

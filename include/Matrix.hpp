@@ -158,7 +158,7 @@ public:
         for (auto it = A.matrix.begin(); it != A.matrix.end(); it++) {
             *it += f;
         }
-        return *this;
+        return A;
     }
     template<class K>
     void operator+=(K f) {

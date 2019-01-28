@@ -56,7 +56,7 @@ _CML_RUN_TEST(func,list);       \
 
 
 template <class cont1, class cont2, class T>
-void test__iter(void) {
+void test__iter_copy1(void) {
     for (int i = 1; i < 20; i++) {
         for(int j = 1; j < i; j++) {
             Container_Multi_Level<cont1 ,cont2, T>  A(i,j);
@@ -65,19 +65,149 @@ void test__iter(void) {
             auto ait = A.begin();
             auto bit = B.begin();
             while (ait != A.end() && bit != B.end()) {
-                TEST_ASSERT_EQUAL(*ait, *bit);
-                ait++; bit++;
+                TEST_ASSERT_EQUAL(*ait++, *bit++);
             }
             TEST_ASSERT(ait==A.end());
             TEST_ASSERT(bit==B.end());
+            
+            
+            while (ait != A.begin() && bit != B.begin()) {
+                ait--;bit--;
+                TEST_ASSERT_EQUAL(*ait, *bit);
+            }
+            TEST_ASSERT(ait==A.begin());
+            TEST_ASSERT(bit==B.begin());
+            
+            
+            while (ait != A.end() && bit != B.end()) {
+                TEST_ASSERT_EQUAL(*ait, *bit);
+                ++ait; ++bit;
+            }
+            TEST_ASSERT(ait==A.end());
+            TEST_ASSERT(bit==B.end());
+            
+            
+            while (ait != A.begin() && bit != B.begin()) {
+                TEST_ASSERT_EQUAL(*(--ait), *(--bit));
+            }
+            TEST_ASSERT(ait==A.begin());
+            TEST_ASSERT(bit==B.begin());
         }
     }
 }
 
+template <class cont1, class cont2, class T>
+void test__iter_copy2(void) {
+    for (int i = 1; i < 20; i++) {
+        for(int j = 1; j < i; j++) {
+            Container_Multi_Level<cont1 ,cont2, T>  A(i,j);
+            Container_Multi_Level<cont1, cont2, T>  B(A);
+            
+            auto ait = A.begin();
+            auto bit = B.begin();
+            while (ait != A.end() && bit != B.end()) {
+                TEST_ASSERT_EQUAL(*ait++, *bit++);
+            }
+            TEST_ASSERT(ait==A.end());
+            TEST_ASSERT(bit==B.end());
+            
+            
+            while (ait != A.begin() && bit != B.begin()) {
+                ait--;bit--;
+                TEST_ASSERT_EQUAL(*ait, *bit);
+            }
+            TEST_ASSERT(ait==A.begin());
+            TEST_ASSERT(bit==B.begin());
+            
+            
+            while (ait != A.end() && bit != B.end()) {
+                TEST_ASSERT_EQUAL(*ait, *bit);
+                ++ait; ++bit;
+            }
+            TEST_ASSERT(ait==A.end());
+            TEST_ASSERT(bit==B.end());
+            
+            
+            while (ait != A.begin() && bit != B.begin()) {
+                TEST_ASSERT_EQUAL(*(--ait), *(--bit));
+            }
+            TEST_ASSERT(ait==A.begin());
+            TEST_ASSERT(bit==B.begin());
+        }
+    }
+}
+
+template <class cont1, class cont2, class T>
+void test__iter_inc(void) {
+    for (int i = 1; i < 20; i++) {
+        for(int j = 1; j < i; j++) {
+            Container_Multi_Level<cont1 ,cont2, T>  A(i,j);
+            auto ait = A.begin();
+            auto bit = A.begin();
+            auto cit = A.cbegin();
+            while (ait != A.end() && bit != A.end() && cit != A.cend()) {
+                T foo = *ait;
+                *ait++ += 1;
+                TEST_ASSERT_EQUAL(*bit, foo+1);
+                TEST_ASSERT_EQUAL(*cit, foo+1);
+                TEST_ASSERT_EQUAL(*++bit, *bit);
+                TEST_ASSERT_EQUAL(*++cit, *cit);
+            }
+            TEST_ASSERT(ait==A.end());
+            TEST_ASSERT(bit==A.end());
+            TEST_ASSERT(cit==A.cend());
+        }
+    }
+}
+
+template <class cont1, class cont2, class T>
+void test__iter_dec(void) {
+    for (int i = 1; i < 20; i++) {
+        for(int j = 1; j < i; j++) {
+            Container_Multi_Level<cont1 ,cont2, T>  A(i,j);
+            auto ait = A.end();
+            auto bit = A.end();
+            auto cit = A.cend();
+            ait--; bit--; cit--;
+            while (ait != A.begin() && bit != A.begin() && cit != A.cbegin()) {
+                T foo = *ait;
+                *ait-- += 1;
+                TEST_ASSERT_EQUAL(*bit, foo+1);
+                TEST_ASSERT_EQUAL(*cit, foo+1);
+                TEST_ASSERT_EQUAL(*--bit, *bit);
+                TEST_ASSERT_EQUAL(*--cit, *cit);
+            }
+            TEST_ASSERT(ait==A.begin());
+            TEST_ASSERT(bit==A.begin());
+            TEST_ASSERT(cit==A.cbegin());
+        }
+    }
+}
+
+template <class cont1, class cont2, class T>
+void test__iter_ptr(void) {
+    for (int i = 1; i < 20; i++) {
+        for(int j = 1; j < i; j++) {
+            Container_Multi_Level<cont1 ,cont2, T>  A(i,j);
+            auto ait = A.begin();
+            auto cit = A.cbegin();
+            while (ait != A.end() && cit != A.cend()) {
+                const T foo = *ait;
+                TEST_ASSERT_EQUAL(&(*ait), ait.operator->());
+                const T phi = *cit;
+                TEST_ASSERT_EQUAL(&(*cit), cit.operator->());
+                TEST_ASSERT_EQUAL(foo, phi);
+                ait++;cit++;
+            }
+        }
+    }
+}
 
 void test__CML(void) {
-    void_func func = test__iter<vector<vector<int>>,vector<int>,int>;
-
-    CML_RUN_TEST(test__iter);
+    CML_RUN_TEST(test__iter_copy1);
+    CML_RUN_TEST(test__iter_copy2);
+    CML_RUN_TEST(test__iter_inc);
+    CML_RUN_TEST(test__iter_dec);
+    CML_RUN_TEST(test__iter_ptr);
 }
 #endif//TESTING

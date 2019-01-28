@@ -235,9 +235,9 @@ void test__iter(void) {
     }
 }
 void test__Matrix(void) {
-//    _MAT_RUN_TEST_NUM_TYPE(test__gen_matrix);
-//    _MAT_RUN_TEST(test__multiply_tk);
-//    _MAT_RUN_TEST(test__add_tk);
+    _MAT_RUN_TEST_NUM_TYPE(test__gen_matrix);
+    _MAT_RUN_TEST(test__multiply_tk);
+    _MAT_RUN_TEST(test__add_tk);
     _MAT_RUN_TEST_NUM_TYPE(test__iter_size);
     _MAT_RUN_TEST_NUM_TYPE(test__iter);
 }

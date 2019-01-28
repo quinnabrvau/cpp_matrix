@@ -14,7 +14,7 @@ using namespace matrix;
 
 int main(int argc, const char * argv[]) {
     UNITY_BEGIN();
-    test__Matrix();
     test__CML();
+    test__Matrix();
     return UNITY_END();
 }
