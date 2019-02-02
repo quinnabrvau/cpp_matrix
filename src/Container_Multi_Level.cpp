@@ -150,8 +150,8 @@ void test__iter_inc(void) {
                 *ait++ += 1;
                 TEST_ASSERT_EQUAL(*bit, foo+1);
                 TEST_ASSERT_EQUAL(*cit, foo+1);
-                TEST_ASSERT_EQUAL(*++bit, *bit);
-                TEST_ASSERT_EQUAL(*++cit, *cit);
+                TEST_ASSERT_EQUAL(*bit, *++bit);
+                TEST_ASSERT_EQUAL(*cit, *++cit);
             }
             TEST_ASSERT(ait==A.end());
             TEST_ASSERT(bit==A.end());
@@ -174,8 +174,8 @@ void test__iter_dec(void) {
                 *ait-- += 1;
                 TEST_ASSERT_EQUAL(*bit, foo+1);
                 TEST_ASSERT_EQUAL(*cit, foo+1);
-                TEST_ASSERT_EQUAL(*--bit, *bit);
-                TEST_ASSERT_EQUAL(*--cit, *cit);
+                TEST_ASSERT_EQUAL(*bit, *--bit);
+                TEST_ASSERT_EQUAL(*cit, *--cit);
             }
             TEST_ASSERT(ait==A.begin());
             TEST_ASSERT(bit==A.begin());
