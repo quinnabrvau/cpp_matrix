@@ -70,10 +70,10 @@ private:
         //TODO multiply
         for (int i = 0; i < sa.first; i++) {
             for (int j = 0; j < sb.second; j++) {
-                L* l = &out[i][j];
+                L* l = out(i,j);
                 *l = 0;
                 for (int k = 0; k<sa.second; k++) {
-                    *l += A(i,k)*B(k,j);
+                    *l += *A(i,k) * *B(k,j);
                 }
             }
         }
@@ -110,7 +110,7 @@ public:
         ASSERT(sb == s);
         for (int c = 0; c < s.first; c++ ) {
             for (int r = 0; r < s.second; r++) {
-                B(c,r) = tMatrix::at(c)[r] + A(c,r);
+                *B(c,r) = tMatrix::at(c)[r] + *A(c,r);
             }
         }
     }
@@ -166,7 +166,7 @@ public:
         if (s.first != sa.first || s.second != sa.second) return false;
         for (int i = 0; i < s.first; i++) {
             for (int j = 0; j < s.second; j++) {
-                if (tMatrix::at(i)[j] != A(i,j)) return false;
+                if (tMatrix::at(i)[j] != *A(i,j)) return false;
             }
         }
         return true;
@@ -285,7 +285,7 @@ Matrix<T> Matrix_Ones(Shape shape) {
     Matrix<T> A(shape);
     for (int i = 0; i < shape.first; i++) {
         for (int j = 0; j < shape.second; j++) {
-            A(i,j) = 1;
+            *A(i,j) = 1;
         }
     }
     return A;

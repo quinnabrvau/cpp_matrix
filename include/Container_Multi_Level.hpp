@@ -33,19 +33,28 @@ namespace matrix {
             return Shape(cont1::size(), cont1::front().size());
         }
         
-        std::vector<T>& operator[](int col) {
-            return cont1::at(col);
+        T& operator[](int pos) {
+            int col = pos/cont1::size();
+            int row = pos%cont1::size();
+            return cont1::at(col)[row];
         };
         
         T& operator[](Position index) {
             return cont1::at(index.first)[index.second];
         };
-        T& operator()(int col, int row) {
-            return cont1::at(col)[row];
+        
+        T* operator()(int pos) {
+            int col = pos/cont1::size();
+            int row = pos%cont1::size();
+            return &cont1::at(col)[row];
         };
         
-        T& operator()(Position index) {
-            return cont1::at(index.first)[index.second];
+        T* operator()(int col, int row) {
+            return &cont1::at(col)[row];
+        };
+        
+        T* operator()(Position index) {
+            return &cont1::at(index.first)[index.second];
         };
         
         class iterator {
