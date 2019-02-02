@@ -13,7 +13,7 @@ steps:
   args: ['make']
   timeout: 60s
 - name: 'gcr.io/$PROJECT_ID/build-image'
-  args: ['CTEST_OUTPUT_ON_FAILURE=TRUE','make','test']
+  args: ['make','CTEST_OUTPUT_ON_FAILURE=TRUE','test']
   timeout: 180s
 images:
 - 'gcr.io/$PROJECT_ID/build-image'
