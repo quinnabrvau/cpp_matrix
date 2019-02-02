@@ -24,56 +24,29 @@
 
 namespace matrix {
 
-typedef std::pair<int,int> Shape;
-typedef Shape Position;
     
 template<class T>
-class Matrix {
+class Matrix: public Container_Multi_Level<std::vector<std::vector<T>>,std::vector<T>,T>  {
+    
     typedef std::vector<T> row_type;
     typedef Container_Multi_Level<std::vector<row_type>,row_type,T> tMatrix;
     
-    tMatrix matrix;
-    void init_matrix(int cols = 1, int rows = 1) {
-        matrix.clear();
-        for (int c = 0; c<cols; c++) {
-            matrix.push_back(std::vector<T>(rows));
-        }
-    };
 public:
-    Matrix (std::vector<std::vector<T>>* p_matrix) : matrix(p_matrix->begin(),p_matrix->end) {}
-    Matrix(Shape s) {
-        init_matrix(s.first, s.second);
-    }
-    Matrix(int cols = 1, int rows = 1) {
-        init_matrix(cols,rows);
-    };
-    Matrix copy(void) {
-        Shape s = shape();
-        Matrix A(s);
-        for (int i = 0; i<s.first; i++) {
-            A.matrix[i] = std::vector<T>(matrix[i].begin(), matrix[i].end());
-        }
-        return A;
-    }
+    Matrix (std::vector<std::vector<T>>* p_matrix) : tMatrix(p_matrix->begin(),p_matrix->end) {}
+    Matrix(Shape s) : tMatrix(s.first, s.second){ }
+    Matrix(int cols = 1, int rows = 1) : tMatrix(cols,rows) { };
     
     int size(void) const {
-        int s = matrix.size();
-        if (s==0) return 0;
-        return s * matrix[0].size();
+        return tMatrix::size();
     }
     Shape shape(void) const{
-        int s = matrix.size();
+        int s = tMatrix::size();
         if (s>0)
-            return std::pair<int,int>(s,matrix[0].size());
+            return tMatrix::shape();
         else
-            return std::pair<int,int>(0,0);
+            return Shape(0,0);
     }
     
-    T& operator[](Position index) {return matrix[index.first][index.second];};
-    std::vector<T>& operator[](int col) { return matrix[col]; };
-    T& operator()(int col, int row) {return matrix[col][row];};
-
-
     template<class K>
     Shape output_shape(Matrix<K>& A) {
         Shape s = this->shape();
@@ -121,7 +94,7 @@ public:
     }
     template<class K>
     void operator*=(K f) {
-        for (auto it = matrix.begin(); it != matrix.end(); it++) {
+        for (auto it = tMatrix::begin(); it != tMatrix::end(); it++) {
             *it *= f;
         }
     }
@@ -137,7 +110,7 @@ public:
         ASSERT(sb == s);
         for (int c = 0; c < s.first; c++ ) {
             for (int r = 0; r < s.second; r++) {
-                B(c,r) = matrix[c][r] + A(c,r);
+                B(c,r) = tMatrix::at(c)[r] + A(c,r);
             }
         }
     }
@@ -155,21 +128,21 @@ public:
     template<class K>
     Matrix operator+(K f) {
         Matrix A = *this;
-        for (auto it = A.matrix.begin(); it != A.matrix.end(); it++) {
+        for (auto it = A.tMatrix::begin(); it != A.tMatrix::end(); it++) {
             *it += f;
         }
         return A;
     }
     template<class K>
     void operator+=(K f) {
-        for (auto it = matrix.begin(); it != matrix.end(); it++) {
+        for (auto it = tMatrix::begin(); it != tMatrix::end(); it++) {
             *it += f;
         }
     }
     
     Matrix operator-(void) {
         Matrix A = *this;
-        for (auto rit = A.matrix.begin(); rit != A.matrix.end(); rit++) {
+        for (auto rit = A.tMatrix::begin(); rit != A.tMatrix::end(); rit++) {
             for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
                 *cit = -(*cit);
             }
@@ -193,14 +166,14 @@ public:
         if (s.first != sa.first || s.second != sa.second) return false;
         for (int i = 0; i < s.first; i++) {
             for (int j = 0; j < s.second; j++) {
-                if (matrix[i][j] != A(i,j)) return false;
+                if (tMatrix::at(i)[j] != A(i,j)) return false;
             }
         }
         return true;
     }
     template<class K>
     bool operator==(K k) {
-        for (auto it = matrix.begin(); it != matrix.end(); it++) {
+        for (auto it = tMatrix::begin(); it != tMatrix::end(); it++) {
             if (*it != k) return false;
         }
         return true;
@@ -218,7 +191,7 @@ public:
     
     template<class K>
     bool operator<(K k) {
-        for (auto rit = matrix.begin(); rit != matrix.end(); rit++) {
+        for (auto rit = tMatrix::begin(); rit != tMatrix::end(); rit++) {
             for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
                 if (*cit >= k) return false;
             }
@@ -228,7 +201,7 @@ public:
     
     template<class K>
     bool operator<=(K k) {
-        for (auto rit = matrix.begin(); rit != matrix.end(); rit++) {
+        for (auto rit = tMatrix::begin(); rit != tMatrix::end(); rit++) {
             for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
                 if (*cit > k) return false;
             }
@@ -238,7 +211,7 @@ public:
     
     template<class K>
     bool operator>(K k) {
-        for (auto rit = matrix.begin(); rit != matrix.end(); rit++) {
+        for (auto rit = tMatrix::begin(); rit != tMatrix::end(); rit++) {
             for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
                 if (*cit <= k) return false;
             }
@@ -248,7 +221,7 @@ public:
     
     template<class K>
     bool operator>=(K k) {
-        for (auto rit = matrix.begin(); rit != matrix.end(); rit++) {
+        for (auto rit = tMatrix::begin(); rit != tMatrix::end(); rit++) {
             for (auto cit = (*rit).begin(); cit != (*rit).end(); cit++) {
                 if (*cit < k) return false;
             }
@@ -262,31 +235,31 @@ public:
     
     // Iterator Creator
     iterator begin(void) {
-        return matrix.begin();
+        return tMatrix::begin();
     }
     iterator end(void) {
-        return matrix.end();
+        return tMatrix::end();
     }
     const_iterator begin(void) const {
-        return matrix.cbegin();
+        return tMatrix::cbegin();
     }
     const_iterator end(void) const {
-        return matrix.cend();
+        return tMatrix::cend();
     }
     const_iterator cbegin(void) const {
-        return matrix.cbegin();
+        return tMatrix::cbegin();
     }
     const_iterator cend(void) const {
-        return matrix.cend();
+        return tMatrix::cend();
     }
     
 // Iterator Init
-    Matrix (iterator be, iterator end):matrix(be,end) { }
-    Matrix (tMatrix* p_matrix) : matrix(p_matrix->begin(),p_matrix->end) {}
+    Matrix (iterator be, iterator end): tMatrix(be,end) { }
+    Matrix (tMatrix* p_matrix) : tMatrix(p_matrix->begin(),p_matrix->end) {}
     
 // Transition Functions
     void leaky_relu(float alpha = 0.0) {
-        for (auto cit = matrix.begin(); cit != matrix.end(); cit++) {
+        for (auto cit = tMatrix::begin(); cit != tMatrix::end(); cit++) {
             for (auto rit = (*cit).begin(); rit < (*cit).end(); rit++) {
                 if (*rit < 0) {
                     *rit *= alpha;

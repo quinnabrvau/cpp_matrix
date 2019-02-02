@@ -12,6 +12,9 @@
 
 namespace matrix {
 
+    typedef std::pair<int,int> Shape;
+    typedef Shape Position;
+    
     template <class cont1, class cont2, class T>
     class Container_Multi_Level:public cont1 {
         typedef typename cont1::iterator c_iterator; //column iterator
@@ -21,6 +24,29 @@ namespace matrix {
         typedef cont2 row_type;
         
     public:
+        
+        size_t size() const {
+            return cont1::size() * cont1::front().size();
+        }
+        
+        Shape shape() const {
+            return Shape(cont1::size(), cont1::front().size());
+        }
+        
+        std::vector<T>& operator[](int col) {
+            return cont1::at(col);
+        };
+        
+        T& operator[](Position index) {
+            return cont1::at(index.first)[index.second];
+        };
+        T& operator()(int col, int row) {
+            return cont1::at(col)[row];
+        };
+        
+        T& operator()(Position index) {
+            return cont1::at(index.first)[index.second];
+        };
         
         class iterator {
             c_iterator cit, end_;
