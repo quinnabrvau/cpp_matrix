@@ -14,6 +14,6 @@ steps:
   timeout: 60s
 - name: 'gcr.io/$PROJECT_ID/build-image'
   args: ['make','test']
-  timeout: 60s
+  timeout: 180s
 images:
 - 'gcr.io/$PROJECT_ID/build-image'
