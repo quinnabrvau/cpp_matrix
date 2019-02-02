@@ -229,11 +229,26 @@ namespace matrix {
             const T* operator->(void) {
                 return rit.operator->();
             }
-            r_iterator_const begin(void) {
+            
+            void operator*=(int junk) {
+                cit++;
+                rit = (*cit).begin();
+                for (int i = 0; i < index; i++) {
+                    rit++;
+                }
+            }
+            
+            r_iterator_const begin(void) const {
                 return (*cit).begin();
             }
-            r_iterator_const end(void) {
+            r_iterator_const end(void) const {
                 return (*cit).end();
+            }
+            r_iterator_const cbegin(void) const {
+                return (*cit).cbegin();
+            }
+            r_iterator_const cend(void) const {
+                return (*cit).cend();
             }
         };
         
